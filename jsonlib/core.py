@@ -1,8 +1,9 @@
-import json
 import os
 import tempfile
 from pathlib import Path
 from typing import Any, Union
+
+from . import _json_impl
 
 PathLike = Union[str, os.PathLike]
 
@@ -22,8 +23,8 @@ class JsonSaveError(JsonLibError):
 def loads(text: str) -> Any:
     """JSON 문자열을 파이썬 객체로 파싱한다."""
     try:
-        return json.loads(text)
-    except json.JSONDecodeError as e:
+        return _json_impl.parse(text)
+    except _json_impl.JSONDecodeError as e:
         raise JsonParseError(f"JSON 문자열 파싱 실패: {e}") from e
 
 
@@ -43,7 +44,7 @@ def load(path: PathLike, encoding: str = "utf-8") -> Any:
 def dumps(data: Any, *, indent: int = 2, ensure_ascii: bool = False) -> str:
     """파이썬 객체를 JSON 문자열로 직렬화한다."""
     try:
-        return json.dumps(data, indent=indent, ensure_ascii=ensure_ascii)
+        return _json_impl.dumps(data, indent=indent, ensure_ascii=ensure_ascii)
     except TypeError as e:
         raise JsonSaveError(f"JSON 직렬화 실패: {e}") from e
 
